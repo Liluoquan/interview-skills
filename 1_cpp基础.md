@@ -504,13 +504,13 @@ private:
 
 - 同一个`shared_ptr`被多个线程"读"是安全的：
 
-- 同一个`shared_ptr`被多个线程写"是不安全的：
+- 同一个`shared_ptr`被多个线程"写"是不安全的：
 
   因为对一个`shared_ptr`写操作分为两步：更改实际指针指向，然后再修改引用计数，如果第一步完成后就切换线程了，因为可能会因为引用计数没增加而导致实际指针被释放。
 
   [一个参考示例](https://blog.csdn.net/solstice/article/details/8547547)
 
-- 共享引用计数的不同的shared_ptri被多个线程"写“是安全的。
+- 共享引用计数的不同的shared_ptr被多个线程"写“是安全的。
 
 - **结论：多个线程访问同一个shared_ptr时，应该要进行加锁操作**
 
@@ -1621,12 +1621,12 @@ C++中的构造函数可以分为4类：默认构造函数、初始化构造函�
 - [ ] 静态多态、动态多态、多态的实现原理、虚函数、虚函数表
 
 1. 多态是同一个事物在不同场景下的多种形态。
-2. **静态多态：**静态多态是编译器在编译期间完成的，编译器会根据实参类型来选择调用合适的函数，如果有合适的函数就调用，没有的话就会发出警告或者报错。静态多态有函数重载、运算符重载、泛型编程等。
+2. **静态多态：**静态多态是编译器在编译期间完成的，编译器会根据实参类型来选择调用合适的函数，如果有合适的函数就调用，没有的话就会发出警告或者报错。静态多态有**函数重载、运算符重载、泛型编程**等。
 3. **动态多态：**动态多态是在程序运行时根据基类的引用（指针）指向的对象来确定自己具体该调用哪一个类的虚函数。当父类指针（引用）指向 父类对象时，就调用父类中定义的虚函数；即当父类指针（引用）指向 子类对象时，就调用子类中定义的虚函数。**动态多态行为的表现效果为：同样的调用语句在实际运行时有多种不同的表现形态。**
 4. **实现动态多态的条件：** 
    - 要有继承关系 - 要有虚函数重写（被 virtual 声明的函数叫虚函数）
    - 要有父类指针（父类引用）指向子类对象
-5. **动态多态的实现原理：**当类中声明虚函数时，编译器会在类中生成一个虚函数表，虚函数表是一个存储类虚函数指针的数据结构， 虚函数表是由**编译器自动生成与维护的**。virtual 成员函数会被编译器放入虚函数表中，存在虚函数时，每个对象中都有一个指向虚函数表的指针（vptr 指针）。在多态调用时, vptr 指针就会根据这个对象在对应类的虚函数表中查找被调用的函数，从而找到函数的入口地址。
+5. **动态多态的实现原理：**当类中声明虚函数时，编译器会在类中生成一个虚函数表，虚函数表是一个存储类虚函数指针的数据结构， 虚函数表是由**编译器自动生成与维护的**。virtual 成员函数会被编译器放入虚函数表中，存在虚函数时，每个对象中都有一个指向虚函数表的指针（vptr 指针）。在多态调用时，vptr 指针就会根据这个对象在对应类的虚函数表中查找被调用的函数，从而找到函数的入口地址。
 
 
 
@@ -1770,6 +1770,10 @@ C++中的构造函数可以分为4类：默认构造函数、初始化构造函�
 
 #### 虚函数表的实现及内存布局
 
+代码参考：[c++对象模型05：虚继承内存布局_为成大道踏平坎坷的博客-CSDN博客_c++ 虚继承内存布局](https://blog.csdn.net/effort_study/article/details/119488496)
+
+![](.\image\c++基础\对象内存布局.svg)
+
 1. 虚函数在地址空间中的存放
 
    ![这里写图片描述](https://img-blog.csdn.net/20180820143644168?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2MzU5MDIy/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
@@ -1810,8 +1814,7 @@ C++中的构造函数可以分为4类：默认构造函数、初始化构造函�
 - 调用一个数据成员对象的构造函数，而该函数有一组参数。
 
 ```c++
-class A
-{
+class A {
     public:
         A(int &v) : i(v), p(v), j(v) {}
         void print_val() { cout << "hello:" << i << "  " << j << endl;}
@@ -1821,6 +1824,33 @@ class A
         int &j;        //引用成员
 };
 ```
+
+
+
+#### C++ 中实现不能被继承的类
+
+1. 将构造函数声明为私有，这样派生类无法调用基类的构造函数进行构造
+
+2. 将自身作为一个已存在类的友元类，利用了友元不能被继承的特性。虚基类构造函数的参数必须由最新派生出来的类负责初始化（即使不是直接继承）
+
+   ```cpp
+   class Base {
+   private:
+   	Base(){}
+   	friend class A;
+   };
+   
+   class A : virtual public Base {
+   public:
+   	A(int a) : ma(a) {}
+   private:
+   	int ma;
+   };
+   ```
+
+3. c++11中可以使用关键字 final
+
+
 
 
 
@@ -2160,6 +2190,28 @@ Lambda表达式可以使用其可见范围内的外部变量，但必须明确�
 | [&]         | 以引用形式捕获所有外部变量                                   |
 | [=, &x]     | 变量x以引用形式捕获，其余变量以传值形式捕获                  |
 | [&, x]      | 变量x以值的形式捕获，其余变量以引用形式捕获                  |
+
+
+
+#### 说一下 RVO 和 NRVO 机制？
+
+RVO 是返回值优化，就是在一个函数内部返回一个匿名对象时，由编译器对这个返回过程进行优化，直接将匿名对象作为返回值，避免函数返回过程中调用拷贝构造函数的开销。
+
+NRVO 是具名返回值优化，函数返回值是一个在函数内部构建的有名对象，同样由编译器对这个返回过程进行优化，直接将有名作为返回值，避免函数返回过程中调用拷贝构造函数的开销。
+
+这两个机制用于返回值是结构体或者类。
+
+
+
+#### 介绍一下 auto 关键字
+
+auto 是自动类型推断，用于从初始化表达式中推断出变量的数据类型，这个推导的工作由编译器完成。
+
+注意点：
+
+1. auto不能自动推导成constant 或者 volatile，会覆盖顶层的引用和修饰，除非被声明为引用类型
+2. auto会退化成指向数组的指针，除非被声明为引用
+3. 如果需要保留顶层的引用和修饰，需要声明为 auto 引用或者使用 decltype
 
 
 
@@ -2561,6 +2613,66 @@ const selt operator++(int) {
 
 
 
+### 实现常用数据结构
+
+#### 实现 string 类
+
+```cpp
+class MyString {
+public:
+    MyString(const char* pData = nullptr);
+    MyString(const MyString& str);
+    MyString& operator= (const MyString& str);
+    ~MyString();
+
+    size_t size() const { return _size; }
+    const char* c_str() const { return _pData; }
+
+private:
+    char* _pData;
+    size_t _size;
+};
+
+MyString::MyString(const char* pData) {
+    // 空指针也要赋值
+    if (pData == nullptr) {
+        _size = 0;
+        _pData = new char[1];
+        *_pData = '\0';
+    }
+    else {
+        _size = strlen(pData);
+        _pData = new char[_size + 1];
+        strcpy(_pData, pData);
+    }
+}
+
+MyString::MyString(const MyString& str) {
+    _size = str.size();
+    _pData = new char[_size + 1];
+    strcpy(_pData, str.c_str());
+}
+
+MyString::~MyString() {
+    delete[] _pData;
+    _pData = nullptr;
+    _size = 0;
+}
+
+MyString& MyString::operator= (const MyString& str) {
+    if (this == &str) {  // 检查自赋值 
+        return *this;
+    }
+    delete[] _pData;
+    _size = str.size();
+    _pData = new char[_size + 1];
+    strcpy(_pData, str.c_str());
+    return *this;
+}
+```
+
+
+
 # 设计模式
 
 ## 单例模式
@@ -2722,23 +2834,23 @@ protected:
 };
 
 template <typename Func>
-class Event:NonCopyable{
+class Event : NonCopyable{
 public:
     Event() = default;
     ~Event() = delete;
-    //注册观察者,支持右值引用
+    // 注册观察者,支持右值引用
     int Attach(Func && f){
         return Assign(f);
     }
-     //注册观察者,支持左值引用
+    // 注册观察者,支持左值引用
     int Attach(Func & f){
         return Assign(f);
     }
-    //移除观察者
+    // 移除观察者
     void Deatach(int iKey){
         m_mapOberserve.erase(iKey);
     }
-    //通知接口
+    // 通知接口
     template <typename... Args>
     void Notify(Args&&... args){
         for(auto& it : m_mapOberserve)
@@ -2770,11 +2882,372 @@ private:
 
 
 
+## 工厂模式
+
+### 简单工厂模式
+
+建立一个工厂类，对实现了同一接口的一些类进行实例的创建。简单工厂模式的实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类（这些产品类继承自一个父类或者接口）的实例。
+
+```cpp
+#include <iostream>
+using namespace std;
+
+// 产品类（抽象类，不能实例化）
+class Product {
+public:
+    Product() {};
+    virtual void show() = 0;  // 纯虚函数
+};
+
+class productA : public Product {
+public:
+    productA() {}
+    void show() { cout << "product A create !" << endl; }
+    ~productA() {}
+};
+
+class productB : public Product {
+public:
+    productB() {}
+    void show() { std::cout << "product B create ! " << endl; }
+    ~productB() {}
+};
+
+class simpleFactory {
+public:
+    simpleFactory() {}
+    Product* product(const string str) {
+        if (str == "productA")	return new productA();
+        if (str == "productB")	return new productB();
+        return nullptr;
+    }
+};
+```
+
+
+
+### 抽象工厂模式
+
+⼯⼚模式⽬的就是代码解耦，如果我们不采⽤⼯⼚模式，如果要创建产品 A、B，通常做法采⽤⽤ switch...case语 句，那么想⼀想后期添加更多的产品进来，我们不是要添加更多的 switch...case 吗？这样就很麻烦，⽽且也不符 合设计模式中的开放封闭原则。
+
+ 为了进⼀步解耦，在简单⼯⼚的基础上发展出了抽象⼯⼚模式，即连⼯⼚都抽象出来，实现了进⼀步代码解耦。
+
+```cpp
+#include <iostream>
+using namespace std;
+
+// 产品类（抽象类，不能实例化）
+class Product {
+public:
+    Product() {};
+    virtual void show() = 0;  // 纯虚函数
+};
+
+class productA : public Product {
+public:
+    productA() {}
+    void show() { cout << "product A create !" << endl; }
+    ~productA() {}
+};
+
+class productB : public Product {
+public:
+    productB() {}
+    void show() { std::cout << "product B create ! " << endl; }
+    ~productB() {}
+};
+
+// 抽象工厂
+class Factory {
+public:
+	virtual Product* CreateProduct() = 0;
+};
+
+// 工厂类A，只生产A产品
+class FactoryA : public Factory {
+public:
+    Product* createProduct() {
+        Product* _product = nullptr;
+        _product = new ProductA();
+        return _product;
+    }
+};
+
+// 工厂类B，只生产B产品
+class FactoryB : public Factory {
+public:
+    Product* createProduct() {
+        Product* _product = nullptr;
+        _product = new ProductB();
+        return _product;
+    }
+};
+```
+
+
+
+### 模板工厂模式
+
+针对工厂方法模式封装成模板工厂类，那么这样在新增产品时，是不需要新增具体的工厂类，减少了代码的编写量。
+
+```cpp
+#include <iostream>
+using namespace std;
+
+// 产品类（抽象类，不能实例化）
+class Product {
+public:
+    Product() {};
+    virtual void show() = 0;  // 纯虚函数
+};
+
+class productA : public Product {
+public:
+    productA() {}
+    void show() { cout << "product A create !" << endl; }
+    ~productA() {}
+};
+
+class productB : public Product {
+public:
+    productB() {}
+    void show() { std::cout << "product B create ! " << endl; }
+    ~productB() {}
+};
+
+// 抽象工厂
+class Factory {
+public:
+	virtual Product* CreateProduct() = 0;
+};
+
+// 工厂类A，只生产A产品
+class FactoryA : public Factory {
+public:
+    Product* createProduct() {
+        Product* _product = nullptr;
+        _product = new ProductA();
+        return _product;
+    }
+};
+
+// 抽象模板工厂类
+// 模板参数：AbstractProduct_t 产品抽象类
+template <typename AbstractProduct_t>
+class AbstractFactory {
+public:
+    virtual AbstractProduct_t* createProduct() = 0;
+    virtual ~AbstractFactory() {}
+};
+
+// 具体模板工厂类
+// 模板参数：AbstractProduct_t 产品抽象类，ConcreteProduct_t 产品具体类
+template <typename AbstractProduct_t, typename ConcreteProduct_t>
+class ConcreteFactory : public AbstractFactory<AbstractProduct_t> {
+public:
+    AbstractProduct_t* createProduct() {
+        return new ConcreteProduct_t();
+    }
+}
+```
+
+
+
+## 装饰器模式
+
+装饰器模式（Decorator Pattern）允许向⼀个现有的对象添加新的功能，**同时⼜不改变其结构**。
+
+`装饰类` 和 `被装饰类` 可以独立发展，不会相互耦合，装饰器模式是继承的一个替代模式，装饰器模式可以动态地扩展实现一个类的功能。**可以将装饰器理解为扩展的功能！！！**
+
+这种类型的设计模式属于结构型模式，它是作为现有的类的⼀个包装。
+
+```cpp
+#include <iostream>
+#include <list>
+#include <memory>
+using namespace std;
+
+class Car {
+public:
+	virtual void show() = 0;
+};
+
+// 三个实体的汽车类
+class Bmw :public Car {
+public:
+	void show() {
+		cout << "这是一辆宝马汽车，配置有：基本配置";
+	}
+};
+
+class Audi :public Car {
+public:
+	void show() {
+		cout << "这是一辆奥迪汽车，配置有：基本配置";
+	}
+};
+
+class Benz :public Car {
+public:
+	void show() {
+		cout << "这是一辆奔驰汽车，配置有：基本配置";
+	}
+};
+
+// 装饰器1 定速巡航
+class Decorator01 :public Car {
+public:
+	Decorator01(Car* p) : pCar(p) {}
+	void show() {
+		pCar->show();
+		cout << "，定速巡航";
+	}
+private:
+	Car* pCar;
+};
+
+// 装饰器2 自动刹车
+class Decorator02 :public Car {
+public:
+	Decorator02(Car* p) : pCar(p) {}
+	void show() {
+		pCar->show();
+		cout << "，自动刹车";
+	}
+private:
+	Car* pCar;
+};
+
+// 装饰器3 定速巡航
+class Decorator03 :public Car {
+public:
+	Decorator03(Car* p) : pCar(p) {}
+	void show() {
+		pCar->show();
+		cout << "，车道偏离";
+	}
+private:
+	Car* pCar;
+};
+
+
+int main() {
+    // 以自身为装饰器的实例对象，来达到扩展功能的目的。
+	Car* p1 = new Decorator01(new Bmw());
+	p1 = new Decorator02(p1);
+	p1 = new Decorator03(p1);
+	p1->show();
+	cout << endl;
+
+	Car* p2 = new Decorator02(new Audi());
+	p2->show();
+	cout << endl;
+
+	Car* p3 = new Decorator03(new Benz());
+	p3->show();
+	cout << endl;
+
+	return 0;
+}
+```
 
 
 
 
 
+
+
+
+
+## 生产者消费者模式
+
+
+
+```cpp
+
+# include<iostream>
+# include<thread>
+# include<vector>
+# include<mutex>
+# include<condition_variable>
+# include<queue>
+
+// 生产者数量
+#define PRODUCT_SIZE 20
+// 消费者数量
+#define CUSTOMER_SIZE 1
+// 最大产品数量
+#define MAX_SIZE 10
+
+using namespace std;
+
+// 互斥锁
+mutex mut;
+// 条件变量
+condition_variable con;
+// 队列，模拟缓冲区
+queue<int> que;
+void Producter()
+{
+	while (true)
+	{
+		Sleep(10);
+		std::unique_lock <std::mutex> lck(mut);
+		while (que.size()> MAX_SIZE) {
+			con.wait(lck);
+		}
+		int data = rand();
+		que.push(data);
+		cout << this_thread::get_id() << "生产了产品：" << data << endl;
+		con.notify_all();
+	}
+}
+
+void Customer()
+{
+	while (true)
+	{
+		std::unique_lock <std::mutex> lck(mut);
+		while (que.empty())
+		{
+			con.wait(lck);
+		}
+		cout << this_thread::get_id() << "消费了产品：" << que.front() << endl;
+		que.pop();
+		con.notify_all();
+	}
+}
+int main()
+{
+	vector<thread> threadPoll;
+	//创建生产者和消费者
+	for (int i = 0; i < PRODUCT_SIZE; ++i)
+	{
+		threadPoll.push_back(thread(Producter));
+	}
+	for (int i = 0; i < PRODUCT_SIZE + CUSTOMER_SIZE; ++i)
+	{
+		threadPoll.push_back(thread(Customer));
+	}
+		
+ 
+    // 主线程等待所有子线程结束再返回
+	for (int i = 0; i < PRODUCT_SIZE + CUSTOMER_SIZE; ++i)
+	{
+		threadPoll[i].join();
+	}
+	
+	return 0;
+}
+```
+
+
+
+# 每日过一遍的知识点
+
+- [ ] 4种智能指针，shared_ptr，weak_ptr，unique_ptr
+- [ ] 虚函数的实现及内存分布
+- [ ] c++面向对象三大特性，
 
 
 
