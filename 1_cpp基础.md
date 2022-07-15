@@ -2823,11 +2823,11 @@ class DerivedSingle : public Singleton<DerivedSingle>{
     friend class Singleton<DerivedSingle>;
  
 public:
-    DerivedSingle(const DerivedSingle&)=delete;
-    DerivedSingle& operator =(const DerivedSingle&)= delete;
+    DerivedSingle(const DerivedSingle&) = delete;
+    DerivedSingle& operator =(const DerivedSingle&) = delete;
  
 private:
-    DerivedSingle()=default;
+    DerivedSingle() = default;
 };
 ```
 
