@@ -2334,9 +2334,9 @@ $ objdump -h main.o
 静态链接最简单的情况就是在编译时和静态库链接在一起成为完整的可执行程序。这里所说的静态库就是对多个目标文件（.o）文件的打包，通常静态链接的包名为lib\*\*\*\*.a，静态链接所有被用到的目标文件都会复制到最终生成的可执行目标文件中。这种方式的好处是在运行时，可执行目标文件已经完全装载完毕，只要按指令序执行即可，速度比较快。
 
 ```bash
-$ gcc -c test1.c    // 生成test1.o
-$ gcc -c test2.c    // 生成test2.c
-$ ar cr libtest.a test1.o test2.o
+$ gcc -c test1.c    # 生成test1.o
+$ gcc -c test2.c    # 生成test2.o
+$ ar cr libtest.a test1.o test2.o  # 生成静态库
 ```
 
 首先编译得到test1.o和test2.o两个目标文件，之后通过ar命令将这两个文件打包为.a文件，文件名格式为lib + 静态库名 + .a后缀。在生成可执行文件需要使用到它的时候只需要在编译时加上即可。需要注意的是，使用静态库时加在最后的名字不是libtest.a，而是l + 静态库名。
@@ -2354,9 +2354,9 @@ $ gcc -o main main.c -ltest
 动态链接在形式上倒是和静态链接非常相似，首先也是需要打包，打包成动态库，不过文件名格式为lib + 动态库名 + .so后缀。不过动态库的打包不需要使用ar命令，gcc就可以完成，但要注意在编译时要加上-fPIC 选项，打包时加上-shared选项。
 
 ```bash
-$ gcc -fPIC -c test1.c 
+$ gcc -fPIC -c test1.c # -fPIC:生成位置无关的代码
 $ gcc -fPIC -c test2.c
-$ gcc -shared test1.o test2.o -o libtest.so
+$ gcc -shared test1.o test2.o -o libtest.so  # 生成动态库
 ```
 
 - **动态链接和静态链接的比较**
@@ -2441,6 +2441,18 @@ $ gcc -shared test1.o test2.o -o libtest.so
 
 - 用set follow-fork-mode child 调试子进程
 - 或者set follow-fork-mode parent 调试父进程
+
+
+
+##### 说一下如何使用gdb调试段错误？
+
+1. 在编译过程中，需要加入 `-g` 选项，来加入 gdb 调试的功能
+2. 使用 gdb 来运行发生段错误的程序
+3. 进入 gdb 调试界面后，输入 `run` 命令运行
+4. 段错误一般都是操作系统发出了 `SIGSEGV` 信号，导致程序中断
+5. 使用 `backtrace` 命令查看程序的函数调用栈
+6. 定位出现问题的堆栈帧，使用 `frame x` 命令切换到指定的堆栈帧 x，查看具体的代码，使用 `print` 命令查看具体参数是否存在问题。
+7. 为发生段错误的前面代码添加断点，从断点开始使用 `next` 命令单步执行，最终定位段错误的问题区域。
 
 
 
