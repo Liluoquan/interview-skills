@@ -11,6 +11,22 @@
 
 
 
+### 运算符
+
+#### 什么运算符可以重载/不可重载？
+
+> 不能重载
+
+`.`, `.*`, `::`, `?:`, `new` , `delete` , `sizeof` , `typeid` , `static_cast` , `dynamic_cast` , `const_cast` ,  `reinterpret_cast`
+
+> 可以重载
+
+除了不能重载的都能重载.0..
+
+`operator new` , `operator delete` , `operator new[]` , `operator delete[]` 
+
+
+
 
 
 ### 关键字
@@ -243,7 +259,7 @@ explicit 关键字只需用于类内的单参数构造函数前面。由于无�
 * 特意用于底层的强制转型，导致实现依赖（implementation-dependent）（就是说，不可移植）的结果，例如，将一个指针转型为一个整数。这样的强制转型在底层代码以外应该极为罕见。
 
 3. **`const_cast<类型说明符>(表达式）->const_cast<int>(a)`**
-* 这个转换类型操纵传递对象的const属性，或者是设置或者是移除
+* 这个转换类型操纵传递对象的 const 属性，或者是设置或者是移除
 * 一般用于强制消除对象的常量性。它是唯一能做到这一点的 C++ 风格的强制转型
 
 4. **`dynamic_cast<类型说明符>(表达式）->dynamic_cast<int>(a)`**
