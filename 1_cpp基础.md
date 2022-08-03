@@ -4,6 +4,8 @@
 
 ### 指针与引用
 
+- [ ] 四个：定义、初始化、合法性、可变性
+
 1. **定义**：指针存放的是某个对象的地址，引用表示的是一个对象的别名。
 2. **初始化**：引用在定义的时候必须进行初始化，但是指针不需要。
 3. **判断合法性**：因为引用在定义的时候必须进行初始化，所以在使用的时候不需要判断它是否为空。但是指针需要。
@@ -58,7 +60,7 @@ const pointer
 int* const a;
 ```
 
-`const`修饰`a`，代表指针本身就是常量，不可改变指向，强调指针本身的不可改变性，只能在定义时初始化。
+`const` 修饰 `a`，代表指针本身就是常量，不可改变指向，强调指针本身的不可改变性，只能在定义时初始化。
 
 ##### 3. 指向常量的指针常量
 
@@ -108,7 +110,7 @@ const int* const a;
 
 
 
-#### override和overload的区别
+#### override 和 overload 的区别
 
 **1、override是重写（覆盖）一个函数**
 
@@ -160,7 +162,7 @@ const int size = vector<int>(26).size()	// 运行期常量
 **constexpr的好处**
 
 1. 为一些不能修改数据提供保障，避免被以外修改的风险
-2. 部分场景，编译器可以在编译期堆constexpr的代码进行优化，提高效率
+2. 部分场景，编译器可以在编译期对constexpr的代码进行优化，提高效率
 3. 相比宏来说，没有额外的开销，更安全可靠
 
 
@@ -232,6 +234,8 @@ mov dword ptr [a], eax
 4.  静态变量默认初始化值为0，如果**没有显示初始化静态变量或者初始化为0的静态变量会存储在 BSS 段，而初显示初始化的静态变量存储在 DATA 段。**
 5. **静态成员函数中不能访问普通的成员变量，只能访问静态成员变量，并且在静态成员函数中没有 this 指针。**
 
+
+
 #### 类相关
 
 ##### explicit
@@ -281,22 +285,21 @@ explicit 关键字只需用于类内的单参数构造函数前面。由于无�
 
 
 
+### malloc 和 new 的区别
 
+- [ ] 属性，参数，返回值，失败处理，构造，5个！
 
-
-### `malloc`和`new`的区别
----
 1. **属性**
 
-`new/delete`是C++关键字，需要编译器支持。`malloc/free`是库函数，需要头文件支持。
+`new/delete` 是C++关键字，需要编译器支持。`malloc/free` 是库函数，需要头文件支持。
 
 2. **参数**
 
-使用`new`操作符申请内存分配时无须指定内存块的大小，编译器会根据类型信息自行计算。而`malloc`则需要显式地指出所需内存的尺寸。
+使用 `new` 操作符申请内存分配时无须指定内存块的大小，编译器会根据类型信息自行计算。而 `malloc` 则需要显式地指出所需内存的尺寸。
 
 3. **返回类型**
 
-`new` 操作符内存分配成功时，返回的是对象类型的指针，类型严格与对象匹配，无须进行类型转换，故`new` 是符合类型安全性的操作符。而 `malloc` 内存分配成功则是返回 `void *`  (可强制转换为任何类型)，需要通过强制类型转换将 `void*` 指针转换成我们需要的类型。
+`new` 操作符内存分配成功时，返回的是对象类型的指针，类型严格与对象匹配，无须进行类型转换，故`new` 是符合类型安全性的操作符。而 `malloc` 内存分配成功则是返回 `void *` (可强制转换为任何类型)，需要通过强制类型转换将 `void*` 指针转换成我们需要的类型。
 
 4. **分配失败**
 
@@ -305,7 +308,7 @@ explicit 关键字只需用于类内的单参数构造函数前面。由于无�
 5. **自定义类型**
 
 `new` 会先调用 `operator new` 函数，申请足够的内存（通常底层使用 `malloc` 实现）。然后调用类型的构造函数，初始化成员变量，最后返回自定义类型指针。`delete` 先调用析构函数，然后调用 `operator delete` 函数释放内存（通常底层使用free实现）。
-`malloc/free`是库函数，只能动态的申请和释放内存，无法强制要求其做自定义类型对象构造和析构工作。
+`malloc/free` 是库函数，只能动态的申请和释放内存，无法强制要求其做自定义类型对象构造和析构工作。
 
 6. **重载**
 
@@ -313,11 +316,11 @@ explicit 关键字只需用于类内的单参数构造函数前面。由于无�
 
 7. **内存区域**
 
-`new`操作符从自由存储区（`free store`）上为对象动态分配内存空间，而`malloc`函数从堆上动态分配内存。自由存储区是C++基于`new`操作符的一个抽象概念，凡是通过`new`操作符进行内存申请，该内存即为自由存储区。而堆是操作系统中的术语，是操作系统所维护的一块特殊内存，用于程序的内存动态分配，C语言使用`malloc`从堆上分配内存，使用`free`释放已分配的对应内存。自由存储区不等于堆，如上所述，布局**new就可以不位于堆中**。
+`new` 操作符从自由存储区（`free store`）上为对象动态分配内存空间，而 `malloc` 函数从堆上动态分配内存。自由存储区是C++基于 `new` 操作符的一个抽象概念，凡是通过 `new` 操作符进行内存申请，该内存即为自由存储区。而堆是操作系统中的术语，是操作系统所维护的一块特殊内存，用于程序的内存动态分配，C语言使用 `malloc` 从堆上分配内存，使用 `free` 释放已分配的对应内存。自由存储区不等于堆，如上所述，布局**new就可以不位于堆中**。
 
 8. **others**
 
-`std::operator new()`和`std::operator delete()`是带异常的`malloc()`和`free()`
+`std::operator new()` 和 `std::operator delete()` 是带异常的 `malloc()` 和 `free()`
 
 
 
@@ -635,18 +638,18 @@ class UniquePtr{
 public:
     UniquePtr();
     UniquePtr(T *_ptr);
-    UniquePtr(UniquePtr &&p); // 移动构造函数
+    UniquePtr(UniquePtr&& p); // 移动构造函数
     ~UniquePtr();
 
 // non-copyable
 private:
-    UniquePtr(const UniquePtr &p);
-    UniquePtr &operator=(const UniquePtr &p);
+    UniquePtr(const UniquePtr& p) = delete;
+    UniquePtr& operator= (const UniquePtr& p) = delete;
 
 public:
     T& operator* ();
     T* operator-> ();
-    UniquePtr &operator=(UniquePtr &&p); // 移动赋值，右值
+    UniquePtr &operator= (UniquePtr&& p); // 移动赋值，右值
     operator bool() const;
 
     // 返回原始指针
@@ -766,7 +769,7 @@ public:
     ~WeakPtr()
     {}
 
-    WeakPtr<T>& operator=(const WeakPtr &p)
+    WeakPtr<T>& operator= (const WeakPtr &p)
     {
         ptr = p.ptr;
         return *this;
@@ -874,7 +877,7 @@ private:
 
 **3、为什么是以两倍的方式扩容而不是三倍四倍，或者其他方式呢？**
 
-考虑可能产生的堆空间浪费，所以增长倍数不能太大，一般是1.5或2；GCC是2；VS是1.5，k=2每次扩展的新尺寸必然刚好大于之前分配的总和，之前分配的内存空间不可能被使用，这样对于缓存并不友好，采用15倍的增长方式可以更好的实现对内存的重复利用。
+考虑可能产生的堆空间浪费，所以增长倍数不能太大，一般是1.5或2；GCC是2；VS是1.5，k=2每次扩展的新尺寸必然刚好大于之前分配的总和，之前分配的内存空间不可能被使用，这样对于缓存并不友好，采用1.5倍的增长方式可以更好的实现对内存的重复利用。
 
 
 
@@ -892,7 +895,7 @@ private:
 
 | 集合               | 底层实现 | 是否有序 | 数值是否可以重复 | 能否更改数值 | 查询效率 | 增删效率 |
 | ------------------ | -------- | -------- | ---------------- | ------------ | -------- | -------- |
-| std::set           | 红黑树   | 有序     | 否               | 否           | O(log n) | O(log n) |
+| std::set           | 红黑树   | 有序     | 否               | 否           | O(logn)  | O(logn)  |
 | std::multiset      | 红黑树   | 有序     | 是               | 否           | O(logn)  | O(logn)  |
 | std::unordered_set | 哈希表   | 无序     | 否               | 否           | O(1)     | O(1)     |
 
@@ -930,7 +933,7 @@ std::unordered_map 底层实现为哈希表，std::map 和std::multimap 的底�
 **1、底层实现**
 
 - map底层是基于红黑树实现的，因此map内部元素排列是有序的。
-- unordered_mapl底层是基于哈希表实现的，因此其元素的排列顺序是杂乱无序的。
+- unordered_map底层是基于哈希表实现的，因此其元素的排列顺序是杂乱无序的。
 
 
 
@@ -1120,6 +1123,18 @@ std::sort(arr, arr + 6, compare);
 // lambda形式
 std::sort(arr, arr + 6, [](const int& a, const int& b) {return a < b});
 ```
+
+
+
+#### 可调用对象
+
+1. 普通函数
+2. 函数指针
+3. 仿函数，即重载了operator()运算符的类对象
+4. 匿名函数，即 **Lambda表达式**
+5. std::function
+
+
 
 
 
@@ -1485,6 +1500,8 @@ for_each(vw.begin(), vw.end(), mem_func(&Widget::test));
 
 
 #### C++ 和 C 中 struct 的区别
+
+- [ ] **函数、权限、继承、实例化**
 
 1. C 的结构体不允许有函数存在（但可以有函数指针），而 C++ 的结构体允许有内部函数，并且允许该函数是虚函数。
 2. C 的结构体内部成员不能设置权限，均为 public。而 C++ 的结构体可以设置内部成员的权限，默认为 public。
@@ -2591,7 +2608,7 @@ $ gcc -shared test1.o test2.o -o libtest.so  # 生成动态库
 - **动态链接和静态链接的比较**
 
 1. 动态库运行时会先检查内存中是否已经有该库的拷贝，若有则共享拷贝，否则重新加载动态库（C语言的标准库就是动态库）。静态库则是每次在编译阶段都将静态库文件打包进去，当某个库被多次引用到时，内存中会有多份副本，浪费资源。
-2. 动态库另一个有点就是更新很容易，当库发生变化时，如果接口没变只需要用新的动态库替换掉就可以了。但是如果是静态库的话就需要重新被编译。
+2. 动态库另一个有点就是**更新很容易**，当库发生变化时，如果接口没变只需要用新的动态库替换掉就可以了。但是如果是静态库的话就需要重新被编译。
 
 3. 不过静态库也有优点，主要就是静态库一次性完成了所有内容的绑定，运行时就不必再去考虑链接的问题了，执行效率会稍微高一些。
 
@@ -3417,83 +3434,66 @@ int main() {
 
 ## 生产者消费者模式
 
-
-
 ```cpp
-
-# include<iostream>
-# include<thread>
-# include<vector>
-# include<mutex>
-# include<condition_variable>
-# include<queue>
-
-// 生产者数量
-#define PRODUCT_SIZE 20
-// 消费者数量
-#define CUSTOMER_SIZE 1
-// 最大产品数量
-#define MAX_SIZE 10
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#include <iostream>
+#include <thread>
+#include <Windows.h>
 
 using namespace std;
 
-// 互斥锁
-mutex mut;
-// 条件变量
+const int PRODUCER_SIZE = 20;  // 生产者数量
+const int CONSUMER_SIZE = 10;  // 消费者数量
+const int MAX_SIZE = 10;       // 缓冲区大小
+
+queue<int> que;  // 模拟缓冲区
+mutex mtx;
 condition_variable con;
-// 队列，模拟缓冲区
-queue<int> que;
-void Producter()
-{
-	while (true)
-	{
-		Sleep(10);
-		std::unique_lock <std::mutex> lck(mut);
-		while (que.size()> MAX_SIZE) {
-			con.wait(lck);
-		}
-		int data = rand();
-		que.push(data);
-		cout << this_thread::get_id() << "生产了产品：" << data << endl;
-		con.notify_all();
-	}
+
+// 生产者
+void put() {
+    while (true) {
+        Sleep(5);
+        unique_lock<mutex> lock(mtx);
+        while (que.size() > MAX_SIZE) {
+            con.wait(lock);
+        }
+        // 生产产品
+        int data = rand();
+        que.emplace(data);
+        cout << this_thread::get_id() << " produce product : " << data << endl;
+        con.notify_one();
+    }
 }
 
-void Customer()
-{
-	while (true)
-	{
-		std::unique_lock <std::mutex> lck(mut);
-		while (que.empty())
-		{
-			con.wait(lck);
-		}
-		cout << this_thread::get_id() << "消费了产品：" << que.front() << endl;
-		que.pop();
-		con.notify_all();
-	}
+// 消费者
+void take() {
+    while (true) {
+        unique_lock<mutex> lock(mtx);
+        while (que.empty()) {
+            con.wait(lock);
+        }
+        // 消费产品
+        int data = que.front();
+        que.pop();
+        cout << this_thread::get_id() << " consume product : " << data << endl;
+        con.notify_one();
+    }
 }
-int main()
-{
-	vector<thread> threadPoll;
-	//创建生产者和消费者
-	for (int i = 0; i < PRODUCT_SIZE; ++i)
-	{
-		threadPoll.push_back(thread(Producter));
-	}
-	for (int i = 0; i < PRODUCT_SIZE + CUSTOMER_SIZE; ++i)
-	{
-		threadPoll.push_back(thread(Customer));
-	}
-		
- 
-    // 主线程等待所有子线程结束再返回
-	for (int i = 0; i < PRODUCT_SIZE + CUSTOMER_SIZE; ++i)
-	{
-		threadPoll[i].join();
-	}
-	
-	return 0;
+
+int main() {
+    vector<thread> threadPool;
+    for (int i = 0; i < PRODUCER_SIZE; ++i) threadPool.emplace_back(put);
+    for (int i = 0; i < CONSUMER_SIZE; ++i) threadPool.emplace_back(take);
+
+    for (int i = 0; i < PRODUCER_SIZE + CONSUMER_SIZE; ++i) {
+        threadPool[i].join();
+    }
+
+    system("pause");
+    return 0;
 }
 ```
 
