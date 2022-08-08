@@ -1459,7 +1459,7 @@ for_each(vw.begin(), vw.end(), mem_func(&Widget::test));
 
 
 
-### 条款42：确定`less<T>`表示operator<
+### 条款42：确定 `less<T>` 表示operator<
 
 
 
