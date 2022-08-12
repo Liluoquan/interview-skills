@@ -41,7 +41,7 @@
 
 判断方法：看`const`修饰谁
 
-##### 1. 常量指针（底层const->指向的对象是const）
+##### 常量指针（底层const->指向的对象是const）
 
 pointer to const
 
@@ -52,7 +52,7 @@ int const* a;
 
 `const` 修饰 `*a`，代表指针指向的对象是`const`，不能通过指针修改对象，强调指针对其所指对象的不可改变性。
 
-##### 2. 指针常量（顶层const->指针本身是const）
+##### 指针常量（顶层const->指针本身是const）
 
 const pointer
 
@@ -62,7 +62,7 @@ int* const a;
 
 `const` 修饰 `a`，代表指针本身就是常量，不可改变指向，强调指针本身的不可改变性，只能在定义时初始化。
 
-##### 3. 指向常量的指针常量
+##### 指向常量的指针常量
 
 ```c++
 const int* const a;
@@ -131,20 +131,16 @@ const int* const a;
 
 #### new和malloc
 
-1、new在分配失败时会抛出bad_alloc异常，不返回空指针；而malloc内存分配失败没有异常，直接返回空指针
+- [ ] 库函数，异常，重载，构造函数，显式指定
 
-2、new申请内存不需要显式指定内存块的大小而malloc需要
-
-3、`operator new()/delete()`可以重载，而malloc/free不允许重载
-
-4、new/delete会调用对象的构造函数和析构函数。malloc不会
-
-5、malloc和free是标准库函数，new/delete是c++运算符
-
-- **operator new和new operator和placement new的区别：**
-- new operator是关键字；operator new是运算符，可以重载，里面实际上调用了new operator；placement new就是在指定的内存地址上构造对象
-
-6、new从自由存储区（c++概念）上分配内存，而malloc从堆（OS的概念）上分配内存
+1. new在分配失败时会抛出bad_alloc异常，不返回空指针；而malloc内存分配失败没有异常，直接返回空指针
+2. new申请内存不需要显式指定内存块的大小而malloc需要
+3. `operator new/delete`可以重载，而malloc/free不允许重载
+4. new/delete会调用对象的构造函数和析构函数。malloc不会
+5. malloc和free是标准库函数，new/delete是c++运算符
+6. **operator new和new operator和placement new的区别：**
+   - new operator是关键字；operator new是运算符，可以重载，里面实际上调用了 malloc ；placement new就是在指定的内存地址上构造对象（会调用对象的构造函数）
+7. new从自由存储区（c++概念）上分配内存，而malloc从堆（OS的概念）上分配内存
 
 
 
