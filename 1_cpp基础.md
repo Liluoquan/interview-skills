@@ -508,11 +508,11 @@ int main(){
 
 **实现要点：**
 
-- 一个模板指针`T* ptr`，指向实际的对象
+- 一个模板指针 `T* ptr`，指向实际的对象
 
 - 一个引用计数
 
-  必须 new 出来的，不然会多个shared_ptr里面会有不同的引用次数而导致多次delete
+  必须 new 出来的，不然会多个 shared_ptr 里面会有不同的引用次数而导致多次 delete
 
 - 重载 `operator*` 和 `operator->`
 
